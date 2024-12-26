@@ -39,9 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+MY_APPS = [
+    'authentication',
+]
+
 THIRTY_PART_APPS = [
     'rest_framework',
     'corsheaders',
+    'authentication',
 ]
 
 INSTALLED_APPS += THIRTY_PART_APPS
@@ -144,3 +149,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
+AUTHENTICATION_BACKENDS = [
+    'path.to.EmailBackend',  # Caminho para o EmailBackend
+    'django.contrib.auth.backends.ModelBackend',  # Mantém o backend padrão
+]
