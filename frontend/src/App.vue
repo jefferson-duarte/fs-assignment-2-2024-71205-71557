@@ -1,22 +1,13 @@
 <template>
+  <!-- The root div element of the app -->
   <div id="app">
+    <!-- This is where the routed components will be rendered based on the active route -->
     <router-view />
   </div>
 </template>
 
-<script>
+<script scoped>
 export default {
-  name: 'App',
+  name: 'App', // Define the name of the component
 };
 </script>
-
-<style>
-/* Global styles */
-body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #ecf0f1;
-  color: #2c3e50;
-}
-</style>

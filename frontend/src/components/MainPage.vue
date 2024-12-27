@@ -12,6 +12,9 @@
         <li>
           <button @click="navigateTo('register-client')">Register as Client</button>
         </li>
+        <li>
+          <button @click="navigateTo('login')">Login</button>
+        </li>
       </ul>
     </nav>
     <section>
@@ -25,7 +28,7 @@
   </div>
 </template>
 
-<script>
+<script scoped>
 export default {
   methods: {
     navigateTo(route) {
@@ -35,7 +38,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main-page {
   text-align: center;
   padding: 20px;

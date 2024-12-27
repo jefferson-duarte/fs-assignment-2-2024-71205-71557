@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script>
+<script scoped>
 import axios from 'axios';
 
 export default {
@@ -66,13 +66,7 @@ export default {
   methods: {
     // Function to handle user registration
     async registerUser() {
-      // Check if passwords match
-      if (this.user.password !== this.user.confirm_password) {
-        this.message = 'Passwords must match.';
-        return;
-      }
-
-      // Prepare the data to be sent to the backend (confirm_password is not sent)
+      // Prepare the data to be sent to the backend
       const userData = {
         first_name: this.user.first_name,
         last_name: this.user.last_name,  
@@ -91,7 +85,16 @@ export default {
         // Handle errors if any
         if (error.response) {
           // If error.response exists, show the error message from backend
-          this.message = 'Error registering user: ' + (error.response.data.detail || 'An error occurred.');
+          const errors = error.response.data;
+          if (errors.email) {
+            this.message = errors.email[0];
+          } else if (errors.non_field_errors) {
+            this.message = errors.non_field_errors[0];
+          } else if (errors.password){
+            this.message = errors.password[0];
+          } else {
+            this.message = 'Error registering user: ' + JSON.stringify(errors);
+          }
         } else {
           // If there's no response, handle the general error
           this.message = 'An unexpected error occurred.';

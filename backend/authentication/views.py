@@ -1,57 +1,79 @@
-import random
-
-from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from rest_framework import generics, serializers, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import generics, serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Nutritionist, UserProfile
 
 
-# Serializador para registrar nutricionista
+# Serializer for registering a nutritionist
 class NutritionistRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
+    phone = serializers.CharField(write_only=True)
+    registration_number = serializers.CharField(write_only=True)
 
     class Meta:
-        model = Nutritionist
+        model = User
         fields = [
-            'name', 'registration_number', 'email',
-            'phone', 'password', 'confirm_password'
+            'first_name', 'last_name', 'registration_number',
+            'email', 'phone', 'password', 'confirm_password'
         ]
 
     def validate(self, data):
+        # Ensure passwords match
         if data['password'] != data['confirm_password']:
-            raise ValidationError("Passwords must match.")
+            raise serializers.ValidationError(
+                {"password": "Passwords must match."}
+            )
 
-        # Remover confirm_password do dicionário antes de criar o usuário
+        # Check if email already exists
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError(
+                {"email": "A user with this email already exists."}
+            )
+
+        # Remove confirm_password from the data dictionary
         data.pop('confirm_password')
 
         return data
 
     def create(self, validated_data):
-        # Remover a senha do dicionário
+        # Remove the password from the validated data
         password = validated_data.pop('password')
-        # Criptografar a senha
+        # Get the phone number
+        phone = validated_data.pop('phone')
+        # Get the registration number
+        registration_number = validated_data.pop('registration_number')
+        # Hash the password
         validated_data['password'] = make_password(password)
-        # Criar o nutricionista com a senha criptografada
-        nutritionist = Nutritionist.objects.create(**validated_data)
+        # Generate a unique username based on the email
+        email = validated_data['email']
+        # Use the part before "@" in the email as the username
+        username = email.split('@')[0]
+
+        validated_data['username'] = username
+        # Create the nutritionist with the hashed password
+        nutritionist = User.objects.create(**validated_data)
+
+        # Create the nutritionist profile and save the phone and registration number
+        Nutritionist.objects.create(
+            user=nutritionist,
+            phone=phone,
+            registration_number=registration_number
+        )
 
         return nutritionist
 
 
-# View para registro de nutricionista
+# View for registering a nutritionist
 class NutritionistRegisterView(generics.CreateAPIView):
     queryset = Nutritionist.objects.all()
     serializer_class = NutritionistRegisterSerializer
 
 
-# Serializador para registrar usuário (cliente)
+# Serializer for registering a user (client)
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
@@ -65,86 +87,62 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        # Verifica se o email já existe
-        if User.objects.filter(email=data['email']).exists():
-            raise ValidationError("A user with this email already exists.")
+        # Ensure passwords match
+        if data['password'] != data['confirm_password']:
+            raise serializers.ValidationError(
+                {"password": "Passwords must match."}
+            )
 
-        # Remover confirm_password do dicionário antes de salvar o usuário
+        # Check if email already exists
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError(
+                {"email": "A user with this email already exists."}
+            )
+
+        # Remove confirm_password from the data dictionary
         data.pop('confirm_password')
 
         return data
 
     def create(self, validated_data):
-        # Remove a senha do dicionário
+        # Remove the password from the validated data
         password = validated_data.pop('password')
-        # Pega o telefone
+        # Get the phone number
         phone = validated_data.pop('phone')
-        # Criptografa a senha
+        # Hash the password
         validated_data['password'] = make_password(password)
-        # Gerar um username único com base no email
+        # Generate a unique username based on the email
         email = validated_data['email']
-        # Usa a parte antes do "@" no email como username
+        # Use the part before "@" in the email as the username
         username = email.split('@')[0]
 
-        # Garantir que o username seja único
-        while User.objects.filter(username=username).exists():
-            # Adiciona um número aleatório para garantir unicidade
-            username = f"{username}{random.randint(1, 100)}"
-
         validated_data['username'] = username
-        # Cria o usuário com a senha criptografada
-        user = User.objects.create(**validated_data)
-        # Cria o perfil de usuário e salva o telefone
 
+        # Create the user with the hashed password
+        user = User.objects.create(**validated_data)
+
+        # Create the user profile and save the phone number
         UserProfile.objects.create(user=user, phone=phone)
 
         return user
 
 
-# View para registro de usuário (cliente)
+# View for registering a user (client)
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
 
 
-# View para login (autenticação)
-class LoginView(APIView):
-    """
-    View to handle user login using email and password and return a JWT token if the credentials are valid.
-    """  # noqa:E501
-
-    def post(self, request, *args, **kwargs):
-        email = request.data.get("email")
-        password = request.data.get("password")
-
-        # Verifica se email e senha foram fornecidos
-        if not email or not password:
-            return Response({"detail": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)  # noqa:E501
-
-        # Tenta autenticar o usuário usando email
-        user = authenticate(request, email=email, password=password)
-
-        if user is not None:
-            # Usuário autenticado, gera o token JWT
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
-
-            # Retorna o token JWT
-            return Response({
-                "access": access_token,
-                "refresh": str(refresh)
-            })
-
-        # Se as credenciais estiverem incorretas
-        return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)  # noqa:E501
+# Custom token serializer to add extra claims
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        token['name'] = user.first_name + " " + user.last_name
+        return token
 
 
-class EmailBackend(ModelBackend):
-    def authenticate(self, request, email=None, password=None, **kwargs):
-        try:
-            user = get_user_model().objects.get(email=email)
-            if user.check_password(password):
-                return user
-        except get_user_model().DoesNotExist:
-            return None
-        return None
+# Custom view to use the custom token serializer
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
