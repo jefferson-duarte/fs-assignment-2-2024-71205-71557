@@ -1,10 +1,10 @@
 // Importing necessary modules and components
 import { createRouter, createWebHistory } from 'vue-router'; // Import Vue Router and the history mode for web
-import MainPage from '../components/MainPage.vue'; // Main page component
-import NutritionistRegister from '@/components/NutritionistRegister.vue'; // Nutritionist registration component
-import UserRegister from '@/components/UserRegister.vue'; // Client registration component
-import LoginPage from '@/components/LoginPage.vue';
-import DashboardPage from '@/components/DashboardPage.vue';
+import MainPage from '../views/MainPage.vue'; // Main page
+import NutritionistRegister from '@/views/NutritionistRegister.vue'; // Nutritionist registration
+import UserRegister from '@/views/UserRegister.vue'; // Client registration
+import LoginPage from '@/views/LoginPage.vue';
+import DashboardPage from '@/views/DashboardPage.vue';
 import axiosInstance from '@/axios'; // Import the Axios instance we created
 
 // Defining the application's routes

@@ -57,7 +57,7 @@ class NutritionistRegisterSerializer(serializers.ModelSerializer):
         # Create the nutritionist with the hashed password
         nutritionist = User.objects.create(**validated_data)
 
-        # Create the nutritionist profile and save the phone and registration number
+        # Create the nutritionist profile and save the phone and registration number  # noqa: E501
         Nutritionist.objects.create(
             user=nutritionist,
             phone=phone,

@@ -1,13 +1,19 @@
 <template>
-  <!-- The root div element of the app -->
   <div id="app">
-    <!-- This is where the routed components will be rendered based on the active route -->
+    <!-- Navbar appears on every page -->
+    <NavBar />
+    <!-- This is where the page components are rendered -->
     <router-view />
   </div>
 </template>
 
-<script scoped>
+<script>
+import NavBar from "./components/NavBar.vue";
+
 export default {
-  name: 'App', // Define the name of the component
+  name: "App",
+  components: {
+    NavBar,
+  },
 };
 </script>

@@ -4,19 +4,6 @@
       <h1>Welcome to Nutrition Management</h1>
       <p>Your ultimate solution for managing clients and nutritionists efficiently.</p>
     </header>
-    <nav>
-      <ul>
-        <li>
-          <button @click="navigateTo('register-nutritionist')">Register as Nutritionist</button>
-        </li>
-        <li>
-          <button @click="navigateTo('register-client')">Register as Client</button>
-        </li>
-        <li>
-          <button @click="navigateTo('login')">Login</button>
-        </li>
-      </ul>
-    </nav>
     <section>
       <h2>About Our Platform</h2>
       <p>
@@ -27,16 +14,6 @@
     </section>
   </div>
 </template>
-
-<script scoped>
-export default {
-  methods: {
-    navigateTo(route) {
-      this.$router.push(`/${route}`);
-    },
-  },
-};
-</script>
 
 <style scoped>
 .main-page {
