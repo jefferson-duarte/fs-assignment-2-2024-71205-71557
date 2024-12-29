@@ -5,26 +5,17 @@
     <!-- Login form -->
     <form @submit.prevent="login" class="login-form">
       <!-- Username input field -->
-      <input 
-        v-model="username" 
-        type="text" 
-        class="login-input" 
-        placeholder="Username" 
-        required 
-      />
+      <input v-model="username" type="text" class="login-input" placeholder="Username" required />
 
       <!-- Password input field -->
-      <input 
-        v-model="password" 
-        type="password" 
-        class="login-input" 
-        placeholder="Password" 
-        required 
-      />
+      <input v-model="password" type="password" class="login-input" placeholder="Password" required />
 
       <!-- Submit button -->
       <button type="submit" class="login-button">Login</button>
 			<p v-if="message" class="error">{{ message }}</p>
+			<p v-if="message" class="error">{{ message }}</p>
+
+      <p v-if="message" class="error">{{ message }}</p>
 
     </form>
   </div>
@@ -36,9 +27,9 @@ import axiosInstance from '../axios';
 export default {
   data() {
     return {
-      username: '', // Username field bound to input
-      password: '',  // Password field bound to input
-			message: '' // Error message to display
+      username: '',
+      password: '',
+      message: ''
     };
   },
   methods: {
@@ -54,10 +45,21 @@ export default {
         localStorage.setItem('accessToken', response.data.access);
         localStorage.setItem('refreshToken', response.data.refresh);
 
-        // Redirect to the dashboard after successful login
-        this.$router.push('/dashboard');
+        const userProfileResponse = await axiosInstance.get('/api/user-profile/');
+        const userProfile = userProfileResponse.data;
+
+        // Redirect based on user type
+        if (userProfile.nutritionist) {
+          this.$router.push('/dashboard');
+        } else {
+          this.$router.push('/available-nutritionists');
+        }
       } catch (error) {
 				this.message = 'Invalid credentials. Please try again.';
+				this.message = 'Invalid credentials. Please try again.';
+        // console.error("Login failed", error);
+        // Handle login error, display error messages, etc.
+        this.message = 'Invalid credentials. Please try again.';
         // console.error("Login failed", error);
         // Handle login error, display error messages, etc.
       }
