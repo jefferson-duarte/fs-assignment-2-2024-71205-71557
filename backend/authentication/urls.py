@@ -1,8 +1,9 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import (MyTokenObtainPairView, NutritionistRegisterView,
-                    UserRegisterView)
+from .views.auth_jwt import MyTokenObtainPairView
+from .views.nutritionist_serializer import NutritionistRegisterView
+from .views.user_serializer import UserRegisterView
 
 urlpatterns = [
     # URL pattern for user registration
