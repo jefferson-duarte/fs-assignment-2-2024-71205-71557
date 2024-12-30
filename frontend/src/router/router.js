@@ -7,6 +7,7 @@ import LoginPage from '@/views/LoginPage.vue'; // Login page component
 import DashboardPage from '@/views/DashboardPage.vue'; // Dashboard component
 import axiosInstance from '@/axios'; // Axios instance with interceptors
 import AvailableNutritionists from '@/views/AvailableNutritionists.vue'; // Available nutritionists component
+import ClientsNutritionist from '@/views/ClientsNutritionist.vue';
 
 // Defining the application's routes
 const routes = [
@@ -15,7 +16,8 @@ const routes = [
   { path: '/register-nutritionist', component: NutritionistRegister }, // Route for nutritionist registration page
   { path: '/login', component: LoginPage }, // Route for login page
   { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true } }, // Route for dashboard with authentication requirement
-  { path: '/available-nutritionists', component: AvailableNutritionists, meta: { requiresAuth: true, requiresClient: true } } // Route for available nutritionists with authentication and client requirement
+  { path: '/available-nutritionists', component: AvailableNutritionists, meta: { requiresAuth: true, requiresClient: true } }, // Route for available nutritionists with authentication and client requirement
+  { path: '/clients-nutritionist', component: ClientsNutritionist, meta: { requiresAuth: true, requiresClient: false } }, // Route for clients of a nutritionist with authentication and nutritionist requirement
 ];
 
 // Creating the Vue Router instance
@@ -43,7 +45,7 @@ router.beforeEach(async (to, from, next) => {
 
           // If the user is a client, allow access; otherwise, redirect to dashboard
           if (userProfile.registration_number) {
-            next({ path: '/dashboard' }); // Redirect nutritionists to dashboard
+            next({ path: '/clients-nutritionist' }); // Redirect nutritionists to dashboard
           } else {
             next(); // Allow clients to proceed
           }

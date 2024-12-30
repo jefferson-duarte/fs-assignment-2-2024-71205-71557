@@ -13,10 +13,6 @@
       <!-- Submit button -->
       <button type="submit" class="login-button">Login</button>
 			<p v-if="message" class="error">{{ message }}</p>
-			<p v-if="message" class="error">{{ message }}</p>
-
-      <p v-if="message" class="error">{{ message }}</p>
-
     </form>
   </div>
 </template>
@@ -50,17 +46,12 @@ export default {
 
         // Redirect based on user type
         if (userProfile.nutritionist) {
-          this.$router.push('/dashboard');
+          this.$router.push('/clients-nutritionist');
         } else {
           this.$router.push('/available-nutritionists');
         }
       } catch (error) {
 				this.message = 'Invalid credentials. Please try again.';
-				this.message = 'Invalid credentials. Please try again.';
-        // console.error("Login failed", error);
-        // Handle login error, display error messages, etc.
-        this.message = 'Invalid credentials. Please try again.';
-        // console.error("Login failed", error);
         // Handle login error, display error messages, etc.
       }
     }
