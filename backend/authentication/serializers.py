@@ -98,6 +98,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class ClientSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'user', 'phone']
+
+
 # Serializer for Nutritionist Profile
 class NutritionistProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()

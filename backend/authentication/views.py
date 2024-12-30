@@ -4,7 +4,7 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Nutritionist, UserProfile
-from .serializers import (NutritionistListSerializer,
+from .serializers import (ClientSerializer, NutritionistListSerializer,
                           NutritionistProfileSerializer,
                           NutritionistRegisterSerializer,
                           UserProfileSerializer, UserRegisterSerializer)
@@ -60,3 +60,15 @@ class NutritionistRegisterView(generics.CreateAPIView):
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()  # Use the custom user model
     serializer_class = UserRegisterSerializer
+
+
+class ClientsOfNutritionistView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if hasattr(request.user, 'nutritionist'):
+            nutritionist = request.user.nutritionist
+            clients = UserProfile.objects.filter(nutritionist=nutritionist)
+            serializer = ClientSerializer(clients, many=True)
+            return Response(serializer.data)
+        return Response({"error": "User is not a nutritionist"}, status=403)

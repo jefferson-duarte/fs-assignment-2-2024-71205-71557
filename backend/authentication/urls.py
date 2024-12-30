@@ -37,4 +37,7 @@ urlpatterns = [
     path(
         'api/user-profile/', views.UserProfileView.as_view(), name='user_profile'  # noqa:E501
     ),
+    path(
+        'api/nutritionist/clients/', views.ClientsOfNutritionistView.as_view(), name='nutritionist_clients'  # noqa:E501
+    ),
 ]
