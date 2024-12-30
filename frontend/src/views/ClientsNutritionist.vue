@@ -31,11 +31,15 @@ export default {
   },
   methods: {
     async fetchClients() {
+      // this.$router.push('/clients-nutritionist'); // Redirect to login page
+
       try {
+        // Fetch list of clients from the backend
         const response = await axiosInstance.get('/api/nutritionist/clients/');
         this.clients = response.data;
       } catch (error) {
-        this.$router.push('/login'); // Redirect to login page
+        // if not list of clients, redirect to dashboard
+        this.$router.push('/dashboard'); 
       }
     },
   }

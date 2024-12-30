@@ -43,6 +43,7 @@ router.beforeEach(async (to, from, next) => {
           const response = await axiosInstance.get('/api/user-profile/');
           const userProfile = response.data;
 
+
           // If the user is a client, allow access; otherwise, redirect to dashboard
           if (userProfile.registration_number) {
             next({ path: '/clients-nutritionist' }); // Redirect nutritionists to dashboard

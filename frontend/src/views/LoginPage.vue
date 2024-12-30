@@ -46,6 +46,8 @@ export default {
 
         // Redirect based on user type
         if (userProfile.nutritionist) {
+          console.log('login page', userProfile);
+
           this.$router.push('/clients-nutritionist');
         } else {
           this.$router.push('/available-nutritionists');

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import generics, views
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
@@ -30,7 +31,7 @@ class SelectNutritionistView(views.APIView):
     def post(self, request):
         user_profile = request.user.userprofile
         nutritionist_id = request.data.get('nutritionist_id')
-        nutritionist = Nutritionist.objects.get(id=nutritionist_id)
+        nutritionist = get_object_or_404(Nutritionist, id=nutritionist_id)
         user_profile.nutritionist = nutritionist
         user_profile.save()
         return Response({"message": "Nutritionist selected successfully"})
@@ -42,10 +43,10 @@ class UserProfileView(views.APIView):
 
     def get(self, request):
         if hasattr(request.user, 'userprofile'):
-            user_profile = UserProfile.objects.get(user=request.user)
+            user_profile = get_object_or_404(UserProfile, user=request.user)
             serializer = UserProfileSerializer(user_profile)
         elif hasattr(request.user, 'nutritionist'):
-            nutritionist_profile = Nutritionist.objects.get(user=request.user)
+            nutritionist_profile = get_object_or_404(Nutritionist, user=request.user)  # noqa:E501
             serializer = NutritionistProfileSerializer(nutritionist_profile)
         return Response(serializer.data)
 
@@ -68,7 +69,7 @@ class ClientsOfNutritionistView(views.APIView):
     def get(self, request):
         if hasattr(request.user, 'nutritionist'):
             nutritionist = request.user.nutritionist
-            clients = UserProfile.objects.filter(nutritionist=nutritionist)
+            clients = get_list_or_404(UserProfile, nutritionist=nutritionist)
             serializer = ClientSerializer(clients, many=True)
             return Response(serializer.data)
         return Response({"error": "User is not a nutritionist"}, status=403)
