@@ -3,9 +3,6 @@
     <!-- Page Title -->
     <h2 class="text-center mb-4">Your Clients</h2>
 
-    <!-- Logout Button -->
-    <button @click="logout" class="btn btn-danger mb-4">Logout</button>
-
     <!-- Error Message Alert -->
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
@@ -41,12 +38,6 @@ export default {
         this.$router.push('/login'); // Redirect to login page
       }
     },
-    // Method to handle logout
-    logout() {
-      localStorage.removeItem('accessToken'); // Remove access token
-      localStorage.removeItem('refreshToken'); // Remove refresh token
-      this.$router.push('/login'); // Redirect to login page
-    }
   }
 }
 </script>
